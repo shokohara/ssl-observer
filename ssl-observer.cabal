@@ -25,6 +25,9 @@ executable ssl-observer-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , ssl-observer
+                     , process
+                     , time
+                     , iso8601-time
   default-language:    Haskell2010
 
 test-suite ssl-observer-test
