@@ -24,19 +24,18 @@ maybeToIO (Just x) = return x
 
 data Payload = Payload { test :: String } deriving Show
 instance FromJSON Payload where
-    parseJSON (Object v) = Payload <$> (v .: "text")
-
+  parseJSON (Object v) = Payload <$> (v .: "text")
 instance ToJSON Payload where
-    toJSON (Payload text) = object [ "text" .= text ]
+  toJSON (Payload text) = object [ "text" .= text ]
 
 sendMessage :: String -> IO ()
 sendMessage text = do
-    initReq <- parseUrl "https://hooks.slack.com/services/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"
-    let payload = Payload text
-    let req' = initReq { secure = True, method = "POST" } -- Turn on https
-    let req = (flip urlEncodedBody) req' [ ("payload", L.toStrict $ encode payload) ]
-    response <- withManager $ httpLbs req
-    L.putStr $ responseBody response
+  initReq <- parseUrl "https://hooks.slack.com/services/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"
+  let payload = Payload text
+  let req' = initReq { secure = True, method = "POST" } -- Turn on https
+  let req = flip urlEncodedBody req' [ ("payload", L.toStrict $ encode payload) ]
+  response <- withManager $ httpLbs req
+  L.putStr $ responseBody response
 
 main = do
   (_, x, _) <- readProcessWithExitCode "sh" ["-c", "gdate -d\"$(gdate -d\"$(echo '' | openssl s_client -connect google.com:443 -servername google.com 3> /dev/null | openssl x509 -enddate -noout | sed 's/notAfter=//')\")\" --utc --iso-8601=\"seconds\" "] []
