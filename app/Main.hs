@@ -20,6 +20,7 @@ import Data.Aeson.Lens
 import Data.Aeson.TH (deriveJSON, defaultOptions, Options(..))
 import Data.Char (toLower)
 import System.IO.Unsafe
+import Network.AWS.Lambda.GetFunction
 import Network.AWS.Lambda.GetFunctionConfiguration
 
 data NoString = NoString deriving (Typeable, Show)
@@ -52,5 +53,8 @@ ssl = do
   print $ d < realToFrac 60*60*24*30*14
 
 main = do
-  x <- return $ getFunctionConfiguration "haskell-test-youcandeletethisfunction"
-  print $ x ^. gfcFunctionName
+  print "x"
+ore = do
+  let x = getFunction ^. functionConfiguration
+  print ""
+  -- print $ x ^. getFunctionResponse . gfrsConfiguration
