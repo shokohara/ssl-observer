@@ -31,6 +31,8 @@ executable ssl-observer-exe
                      , aeson
                      , bytestring
                      , http-conduit
+                     , lens
+                     , lens-aeson
   default-language:    Haskell2010
 
 test-suite ssl-observer-test

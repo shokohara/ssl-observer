@@ -15,6 +15,11 @@ import Data.Time.Clock
 import Data.Maybe
 import Control.Exception
 import Data.Typeable
+import Control.Lens
+import Data.Aeson.Lens
+import Data.Aeson.TH (deriveJSON, defaultOptions, Options(..))
+import Data.Char (toLower)
+import System.IO.Unsafe
 
 data NoString = NoString deriving (Typeable, Show)
 instance Exception NoString
@@ -38,9 +43,13 @@ sendMessage text = do
     response <- withManager $ httpLbs req
     L.putStr $ responseBody response
 
-main = do
+ssl = do
   (_, x, _) <- readProcessWithExitCode "sh" ["-c", "gdate -d\"$(gdate -d\"$(echo '' | openssl s_client -connect google.com:443 -servername google.com 3> /dev/null | openssl x509 -enddate -noout | sed 's/notAfter=//')\")\" --utc --iso-8601=\"seconds\" "] []
   z <- maybeToIO $ parseISO8601 x
   c <- getCurrentTime
   let d = diffUTCTime z c
   print $ d < realToFrac 60*60*24*30*14
+
+main = do
+  let json = unsafePerformIO $ readFile ".event.json"
+  print $ json ^.. key "Records" . _Array . traverse . to ( \o -> ( o^?! key "EventSubscriptionArn" . _String, o^?! key "EventSource" . _String, o^?! key "EventVersion" . _String, o ^.. key "Sns" . key "Subject" . _String ))
