@@ -32,7 +32,7 @@ instance FromJSON Payload where
     parseJSON (Object v) = Payload <$> (v .: "text")
 
 instance ToJSON Payload where
-    toJSON (Payload text) = object [ "text" .= text ]
+    toJSON (Payload text) = object [ "text" Data.Aeson..= text ]
 
 sendMessage :: String -> IO ()
 sendMessage text = do
@@ -51,5 +51,5 @@ ssl = do
   print $ d < realToFrac 60*60*24*30*14
 
 main = do
-  let json = unsafePerformIO $ readFile ".event.json"
+  let json = unsafePerformIO $ Prelude.readFile ".event.json"
   print $ json ^.. key "Records" . _Array . traverse . to ( \o -> ( o^?! key "EventSubscriptionArn" . _String, o^?! key "EventSource" . _String, o^?! key "EventVersion" . _String, o ^.. key "Sns" . key "Subject" . _String ))
