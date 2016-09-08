@@ -20,6 +20,7 @@ import Data.Aeson.Lens
 import Data.Aeson.TH (deriveJSON, defaultOptions, Options(..))
 import Data.Char (toLower)
 import System.IO.Unsafe
+import Network.AWS.Lambda.GetFunctionConfiguration
 
 data NoString = NoString deriving (Typeable, Show)
 instance Exception NoString
@@ -51,5 +52,6 @@ ssl = do
   print $ d < realToFrac 60*60*24*30*14
 
 main = do
-  let json = unsafePerformIO $ Prelude.readFile ".event.json"
-  print $ json ^.. key "Records" . _Array . traverse . to ( \o -> ( o^?! key "EventSubscriptionArn" . _String, o^?! key "EventSource" . _String, o^?! key "EventVersion" . _String, o ^.. key "Sns" . key "Subject" . _String ))
+  x <- return $ getFunctionConfiguration "haskell-test-youcandeletethisfunction"
+  print $ gfcFunctionName x
+  print "x"

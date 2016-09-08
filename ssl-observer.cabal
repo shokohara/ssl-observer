@@ -33,6 +33,7 @@ executable ssl-observer-exe
                      , http-conduit
                      , lens
                      , lens-aeson
+                     , amazonka-lambda
   default-language:    Haskell2010
 
 test-suite ssl-observer-test
