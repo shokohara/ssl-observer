@@ -30,10 +30,10 @@ instance ToJSON Payload where
 
 sendMessage :: String -> IO ()
 sendMessage text = do
-  initReq <- parseUrl "https://hooks.slack.com/services/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"
+  initReq <- parseUrlThrow "https://hooks.slack.com/services/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"
   let payload = Payload text
   let req' = initReq { secure = True, method = "POST" } -- Turn on https
-  let req = flip urlEncodedBody req' [ ("payload", L.toStrict $ encode payload) ]
+  let req = urlEncodedBody [ ("payload", L.toStrict $ encode payload) ] req'
   response <- withManager $ httpLbs req
   L.putStr $ responseBody response
 
