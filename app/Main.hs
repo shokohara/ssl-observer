@@ -53,5 +53,4 @@ ssl = do
 
 main = do
   x <- return $ getFunctionConfiguration "haskell-test-youcandeletethisfunction"
-  print $ gfcFunctionName x
-  print "x"
+  print $ x ^. gfcFunctionName
