@@ -52,4 +52,5 @@ ssl = do
 
 main = do
   let json = unsafePerformIO $ Prelude.readFile ".event.json"
-  print $ json ^.. key "Records" . _Array . traverse . to ( \o -> ( o^?! key "EventSubscriptionArn" . _String, o^?! key "EventSource" . _String, o^?! key "EventVersion" . _String, o ^.. key "Sns" . key "Subject" . _String ))
+--  print $ json ^.. key "Records" . _Array . traverse . to ( \o -> ( o^?! key "EventSubscriptionArn" . _String, o^?! key "EventSource" . _String, o^?! key "EventVersion" . _String, o ^.. key "Sns" . key "Subject" . _String ))
+  print $ join $ json ^? key "context" . to (\o -> ( o ^? key "functionName"))
