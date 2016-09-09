@@ -7,6 +7,7 @@ import System.IO.Unsafe
 import Data.ByteString.Char8
 import Data.Aeson
 import Control.Applicative
+import Control.Monad
 import System.Environment
 import Lib
 import System.Process
@@ -28,9 +29,13 @@ instance FromJSON Payload where
 instance ToJSON Payload where
   toJSON (Payload text) = object [ "text" .= text ]
 
+url = "https://hooks.slack.com/services/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"
+domain = "google.com"
+day = 3
+
 sendMessage :: String -> IO ()
 sendMessage text = do
-  initReq <- parseUrlThrow "https://hooks.slack.com/services/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"
+  initReq <- parseUrlThrow url
   let payload = Payload text
   let req' = initReq { secure = True, method = "POST" } -- Turn on https
   let req = urlEncodedBody [ ("payload", L.toStrict $ encode payload) ] req'
@@ -38,8 +43,7 @@ sendMessage text = do
   L.putStr $ responseBody response
 
 main = do
-  (_, x, _) <- readProcessWithExitCode "sh" ["-c", "gdate -d\"$(gdate -d\"$(echo '' | openssl s_client -connect google.com:443 -servername google.com 3> /dev/null | openssl x509 -enddate -noout | sed 's/notAfter=//')\")\" --utc --iso-8601=\"seconds\" "] []
+  (_, x, _) <- readProcessWithExitCode "sh" ["-c", "gdate -d\"$(echo '' | openssl s_client -connect " ++ domain ++ ":443 -servername " ++ domain ++" 3> /dev/null | openssl x509 -enddate -noout | sed 's/notAfter=//')\" --utc --iso-8601=\"seconds\""] []
   z <- maybeToIO $ parseISO8601 x
   c <- getCurrentTime
-  let d = diffUTCTime z c
-  print $ d < realToFrac 60*60*24*30*14
+  when (diffUTCTime z c < realToFrac 60*60*24*day) $ sendMessage domain
